@@ -9,7 +9,7 @@ PWD := $(shell pwd)
 
 GIT_HOOKS := .git/hooks/applied
 
-all: $(GIT_HOOKS) client
+all: $(GIT_HOOKS) client transfer
 	$(MAKE) -C $(KDIR) M=$(PWD) modules
 
 $(GIT_HOOKS):
@@ -18,7 +18,7 @@ $(GIT_HOOKS):
 
 clean:
 	$(MAKE) -C $(KDIR) M=$(PWD) clean
-	$(RM) client out
+	$(RM) client out transfer *.png
 load:
 	sudo insmod $(TARGET_MODULE).ko
 unload:
@@ -26,6 +26,13 @@ unload:
 
 client: client.c
 	$(CC) -o $@ $^
+
+transfer: transfer.c
+	$(CC) -o $@ $^
+
+plot: time.gp time
+	@gnuplot $<
+	@eog time.png
 
 PRINTF = env printf
 PASS_COLOR = \e[32;01m

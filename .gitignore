@@ -29,3 +29,6 @@ dkms.conf
 # test-oriented
 client
 out
+transfer
+*.png
+time

@@ -1,6 +1,8 @@
 CONFIG_MODULE_SIG = n
 TARGET_MODULE := fibdrv
 
+CFLAGS := -std=c99 -Wall -Werror
+
 obj-m := $(TARGET_MODULE).o
 ccflags-y := -std=gnu99 -Wno-declaration-after-statement
 
@@ -18,7 +20,7 @@ $(GIT_HOOKS):
 
 clean:
 	$(MAKE) -C $(KDIR) M=$(PWD) clean
-	$(RM) client out transfer *.png
+	$(RM) client out transfer *.png apa test
 load:
 	sudo insmod $(TARGET_MODULE).ko
 unload:
@@ -28,11 +30,17 @@ client: client.c
 	$(CC) -o $@ $^
 
 transfer: transfer.c
-	$(CC) -o $@ $^
+	$(CC) $(CFLAGS) -o $@ $^
 
 plot: time.gp time
 	@gnuplot $<
 	@eog time.png
+
+apa: apa.c apa.h
+	$(CC) $(CFLAGS) -o $@ $^
+
+test: apa.h test.c
+	$(CC) $(CFLAGS) -o $@ $^
 
 PRINTF = env printf
 PASS_COLOR = \e[32;01m

@@ -5,7 +5,8 @@
 #include <stdint.h>
 #include <time.h>
 
-#define CARRY 10000000000000000000ULL
+#define CARRY 18446744073709551615ULL
+// #define CARRY 10000000000000000000ULL
 // 10001010 11000111 00100011 00000100 10001001 11101000 00000000 00000000
 
 struct u64 {
@@ -13,15 +14,17 @@ struct u64 {
     unsigned long long msl;
 };
 
-void displayBit( unsigned long long int input ) {
+void displayBit(unsigned long long int input)
+{
     unsigned long long int display = (1ULL << 63);
-    for ( int i = 1 ; i <= 64 ; i++ ) {
-        putchar( input & display ? '1' : '0' );
+    for (int i = 1; i <= 64; i++) {
+        putchar(input & display ? '1' : '0');
         display >>= 1;
-        if ( i % 8 == 0 ) putchar(' ');
+        if (i % 8 == 0)
+            putchar(' ');
     }
     putchar('\n');
-    return ;
+    return;
 }
 
 long diff_in_ns(struct timespec t1, struct timespec t2)
@@ -122,7 +125,7 @@ struct u64 *subtracter(struct u64 *input1, struct u64 *input2)
     if (input1->lsl < input2->lsl) {
         unsigned long long mycarry = CARRY;
         input1->msl -= 1;
-        r->lsl = mycarry + input1->lsl - input2->lsl;
+        r->lsl = mycarry + input1->lsl - input2->lsl + 1;
         r->msl = input1->msl - input2->msl;
     } else {
         r->lsl = input1->lsl - input2->lsl;
@@ -147,6 +150,7 @@ struct u64 *multiplier(struct u64 *input1, struct u64 *input2)
 
             tmp.lsl = (input1->lsl << i);
             tmp.msl = i == 0 ? 0 : (input1->lsl >> (width - i));
+            // tmp.msl = 0;
             r = adder(r, &tmp);
         }
     }

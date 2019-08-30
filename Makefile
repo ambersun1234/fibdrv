@@ -42,6 +42,13 @@ apa: apa.c apa.h
 test: apa.h test.c
 	$(CC) $(CFLAGS) -o $@ $^
 
+verify: result.txt verification.py
+	python3 verification.py
+
+result.txt: apa.h apa.c
+	$(CC) $(CFLAGS) -o apa $^
+	./apa > /dev/null
+
 PRINTF = env printf
 PASS_COLOR = \e[32;01m
 NO_COLOR = \e[0m

@@ -12,14 +12,16 @@ static struct u64 fibonacci(uint32_t input)
     unsigned int msb = clz(input);
     unsigned int mask = (1 << (31 - msb - 1));
     struct u64 current = {.msl = 0, .lsl = 1}, next = {.msl = 0, .lsl = 1};
-    struct u64 mul = {.msl = 0, .lsl = 2};
+    struct u64 mul = {.msl = 0, .lsl = 2}, zero = {.msl = 0, .lsl = 0};
 
     /* fast doubling formula
      * f(2k) = f(k)[2f(k + 1) - f(k)]
      * f(2k + 1) = f(k + 1)^2 + f(k)^2
      */
 
-    if (input <= 2)
+    if (input == 0)
+        return zero;
+    if (input >= 1 && input <= 2)
         return current;
 
     while (mask > 0) {
@@ -75,7 +77,9 @@ int main()
     struct u64 result;
     struct timespec start, end;
     uint32_t counter = 0, maxFib = 150;
+    char buffer[500];
 
+    FILE *fp = fopen("./result.txt", "w");
 
     for (counter = 0; counter <= maxFib; counter++) {
         clock_gettime(CLOCK_MONOTONIC, &start);
@@ -84,7 +88,11 @@ int main()
 
         printf("%d %llu+%llu*18446744073709551616 %ld\n", counter, result.lsl,
                result.msl, diff_in_ns(start, end));
+        sprintf(buffer, "%d %llu+%llu*18446744073709551616 %ld\n", counter,
+                result.lsl, result.msl, diff_in_ns(start, end));
+        fputs(buffer, fp);
     }
+    fclose(fp);
 
     return 0;
 }

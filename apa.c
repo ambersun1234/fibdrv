@@ -86,10 +86,10 @@ int main()
         result = fibonacci(counter);
         clock_gettime(CLOCK_MONOTONIC, &end);
 
-        printf("%d %llu+%llu*18446744073709551616 %ld\n", counter, result.lsl,
-               result.msl, diff_in_ns(start, end));
-        sprintf(buffer, "%d %llu+%llu*18446744073709551616 %ld\n", counter,
-                result.lsl, result.msl, diff_in_ns(start, end));
+        printf("%d %llu+%llu*%llu %ld\n", counter, result.lsl, result.msl,
+               CARRY, diff_in_ns(start, end));
+        sprintf(buffer, "%d %llu+%llu*%llu %ld\n", counter, result.lsl,
+                result.msl, CARRY, diff_in_ns(start, end));
         fputs(buffer, fp);
     }
     fclose(fp);

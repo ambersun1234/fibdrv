@@ -149,6 +149,14 @@ int main()
     result = subtracter(&test, &test2);
     output(fp, result, test, test2, '-');
 
+    test.msl = 0;
+    test.lsl = 888888888888;
+    test2.msl = 0;
+    test2.lsl = 666666666666;
+
+    result = multiplier(&test, &test2);
+    output(fp, result, test, test2, '*');
+
     fclose(fp);
 
     return 0;

@@ -42,8 +42,15 @@ apa: apa.c apa.h
 test: apa.h test.c
 	$(CC) $(CFLAGS) -o $@ $^
 
+vtest: test.txt verificationTest.py
+	python3 verificationTest.py
+
 verify: result.txt verification.py
 	python3 verification.py
+
+test.txt: test.c apa.h
+	$(CC) $(CFLAGS) -o test $^
+	./test > /dev/null
 
 result.txt: apa.h apa.c
 	$(CC) $(CFLAGS) -o apa $^

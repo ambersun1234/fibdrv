@@ -20,7 +20,7 @@ $(GIT_HOOKS):
 
 clean:
 	$(MAKE) -C $(KDIR) M=$(PWD) clean
-	$(RM) client out transfer *.png apa test
+	$(RM) client out transfer *.png apa test time
 load:
 	sudo insmod $(TARGET_MODULE).ko
 unload:

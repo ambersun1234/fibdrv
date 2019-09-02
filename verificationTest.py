@@ -8,6 +8,7 @@ if __name__ == "__main__":
             r1 = eval(re.sub(r'\b0+(?!\b)', '', myline[0]))
             r2 = eval(re.sub(r'\b0+(?!\b)', '', myline[1].rstrip()))
 
+            # print("{}, {}".format(r1, r2))
             if r1 == r2:
                 print("{}: {}".format(myline[0], "passed"))
             else:

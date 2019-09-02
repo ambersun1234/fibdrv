@@ -70,50 +70,32 @@ uint32_t clz(uint32_t input)
 
 struct u64 *adder(struct u64 *input1, struct u64 *input2)
 {
-    unsigned long long width = 8 * sizeof(unsigned long long), x = 1;
-    // 8 bits * how many bytes
-    unsigned long long mycarry = 0;
+    unsigned long long diff = 0;
 
     struct u64 *r = malloc(sizeof(struct u64));
     r->lsl = 0;
     r->msl = 0;
 
     if (input1->lsl >= CARRY) {
-        mycarry += input1->lsl / CARRY;
-        input1->lsl -= CARRY * mycarry;
+        input1->lsl -= CARRY;
+        r->msl += 1;
     }
     if (input2->lsl >= CARRY) {
-        mycarry += input2->lsl / CARRY;
-        input2->lsl -= CARRY * mycarry;
+        input2->lsl -= CARRY;
+        r->msl += 1;
     }
 
-    r->msl = input1->msl + input2->msl + mycarry;
+    r->lsl = input1->lsl;
+    r->msl = input1->msl + input2->msl;
 
-    for (unsigned long long i = 0; i < width; i++) {
-        unsigned long long tmp1, tmp2;
-        mycarry = 0;
-
-        tmp1 = (input1->lsl >> i) & 0x1;
-        tmp2 = (input2->lsl >> i) & 0x1;
-
-        unsigned long long t1 = ((x << i) * tmp1);
-        unsigned long long t2 = ((x << i) * tmp2);
-
-        r->lsl += t1 + t2;
-        if (r->lsl >= CARRY) {
-            mycarry += r->lsl / CARRY;
-            r->lsl -= CARRY * mycarry;
-        }
-
-        r->msl += mycarry;
+    diff = CARRY - r->lsl;
+    if (input2->lsl > diff) {
+        input2->lsl -= diff;
+        r->lsl = input2->lsl;
+        r->msl += 1;
+    } else {
+        r->lsl += input2->lsl;
     }
-
-    mycarry = 0;
-    if (r->lsl >= CARRY) {
-        mycarry += r->lsl / CARRY;
-        r->lsl -= CARRY * mycarry;
-    }
-    r->msl += mycarry;
 
     return r;
 }
@@ -124,9 +106,9 @@ struct u64 *subtracter(struct u64 *input1, struct u64 *input2)
 
     if (input1->lsl < input2->lsl) {
         unsigned long long mycarry = CARRY;
-        input1->msl -= 1;
         r->lsl = mycarry + input1->lsl - input2->lsl + 1;
         r->msl = input1->msl - input2->msl;
+        r->msl -= 1;
     } else {
         r->lsl = input1->lsl - input2->lsl;
         r->msl = input1->msl - input2->msl;
@@ -149,8 +131,8 @@ struct u64 *multiplier(struct u64 *input1, struct u64 *input2)
             r->msl += input1->msl << i;
 
             tmp.lsl = (input1->lsl << i);
-            tmp.msl = i == 0 ? 0 : (input1->lsl >> (width - i));
-            // tmp.msl = 0;
+            // tmp.msl = i == 0 ? 0 : (input1->lsl >> (width - i));
+            tmp.msl = 0;
             r = adder(r, &tmp);
         }
     }

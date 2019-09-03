@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <time.h>
+#include <limits.h>
 
 #include "./apa.h"
 
@@ -86,10 +87,10 @@ int main()
         result = fibonacci(counter);
         clock_gettime(CLOCK_MONOTONIC, &end);
 
-        printf("%d %llu+%llu*%llu %ld\n", counter, result.lsl, result.msl,
-               CARRY, diff_in_ns(start, end));
-        sprintf(buffer, "%d %llu+%llu*%llu %ld\n", counter, result.lsl,
-                result.msl, CARRY, diff_in_ns(start, end));
+        printf("%d %llu+%llu*%llu+%llu %ld\n", counter, result.lsl, result.msl,
+               ULLONG_MAX, result.msl, diff_in_ns(start, end));
+        sprintf(buffer, "%d %llu+%llu*%llu+%llu %ld\n", counter, result.lsl,
+                result.msl, ULLONG_MAX, result.msl, diff_in_ns(start, end));
         fputs(buffer, fp);
     }
     fclose(fp);

@@ -6,10 +6,6 @@
 #include <limits.h>
 #include <time.h>
 
-#define CARRY 18446744073709551615ULL
-// #define CARRY 10000000000000000000ULL
-// 10001010 11000111 00100011 00000100 10001001 11101000 00000000 00000000
-
 struct u64 {
     unsigned long long lsl;
     unsigned long long msl;
@@ -79,22 +75,13 @@ struct u64 *adder(struct u64 *input1, struct u64 *input2)
     r->lsl = input1->lsl;
     r->msl = input1->msl + input2->msl;
 
-    // diff = CARRY - r->lsl;
     diff = ULLONG_MAX - r->lsl;
     if (input2->lsl >= diff) {
-        input2->lsl -= diff;
         r->lsl += input2->lsl;
         r->msl += 1;
     } else {
         r->lsl += input2->lsl;
     }
-
-    // unsigned long long carry = 0;
-    // if ((ULLONG_MAX - input2->lsl) < input1->lsl) {
-    //     carry = 1;
-    // }
-    // r->msl = input1->msl + input2->msl + carry;
-    // r->lsl = input1->lsl + input2->lsl;
 
     return r;
 }
@@ -104,7 +91,7 @@ struct u64 *subtracter(struct u64 *input1, struct u64 *input2)
     struct u64 *r = malloc(sizeof(struct u64));
 
     if (input1->lsl < input2->lsl) {
-        unsigned long long mycarry = CARRY;
+        unsigned long long mycarry = ULLONG_MAX;
         r->lsl = mycarry + input1->lsl - input2->lsl + 1;
         r->msl = input1->msl - input2->msl - 1;
     } else {

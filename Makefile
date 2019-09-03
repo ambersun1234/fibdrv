@@ -36,6 +36,10 @@ plot: time.gp time
 	@gnuplot $<
 	@eog time.png
 
+fibplot: fibtime.gp result.txt
+	@gnuplot $<
+	@eog fibtime.png
+
 apa: apa.c apa.h
 	$(CC) $(CFLAGS) -o $@ $^
 

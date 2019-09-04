@@ -6,6 +6,7 @@
 #include <linux/kernel.h>
 #include <linux/module.h>
 #include <linux/mutex.h>
+#include <linux/slab.h>
 
 MODULE_LICENSE("Dual MIT/GPL");
 MODULE_AUTHOR("National Cheng Kung University, Taiwan");
@@ -24,15 +25,15 @@ static struct cdev *fib_cdev;
 static struct class *fib_class;
 static DEFINE_MUTEX(fib_mutex);
 
-static struct u64 {
-	unsigned long long lsl;
-	unsigned long long msl;
-}
+struct u64 {
+    unsigned long long lsl;
+    unsigned long long msl;
+};
 
-static uint32_t clz(uint32_t input)
+static int myclz(int input)
 {
     // use binary search method to check
-    uint8_t count = 0;
+    int count = 0;
 
     if ((input & 0xFFFF0000) == 0) {
         input <<= 16;
@@ -59,7 +60,7 @@ static uint32_t clz(uint32_t input)
 
 static struct u64 *adder(struct u64 *input1, struct u64 *input2)
 {
-    struct u64 *r = kmalloc(sizeof(struct u64), GFP_KERNEL);
+    struct u64 *r = (struct u64 *) kmalloc(sizeof(struct u64), GFP_KERNEL);
     r->lsl = 0;
     r->msl = 0;
 
@@ -80,7 +81,7 @@ static struct u64 *adder(struct u64 *input1, struct u64 *input2)
 
 static struct u64 *subtracter(struct u64 *input1, struct u64 *input2)
 {
-    struct u64 *r = kmalloc(sizeof(struct u64), GFP_KERNEL);
+    struct u64 *r = (struct u64 *) kmalloc(sizeof(struct u64), GFP_KERNEL);
 
     if (input1->lsl < input2->lsl) {
         unsigned long long mycarry = ULLONG_MAX;
@@ -95,7 +96,7 @@ static struct u64 *subtracter(struct u64 *input1, struct u64 *input2)
 
 static struct u64 *multiplier(struct u64 *input1, struct u64 *input2)
 {
-    struct u64 *r = kmalloc(sizeof(struct u64), GFP_KERNEL);
+    struct u64 *r = (struct u64 *) kmalloc(sizeof(struct u64), GFP_KERNEL);
     r->lsl = 0;
     r->msl = 0;
 
@@ -121,11 +122,11 @@ static struct u64 *multiplier(struct u64 *input1, struct u64 *input2)
     return r;
 }
 
-static struct u64 fibonacci(uint32_t input)
+static struct u64 fibonacci(int input)
 {
-    unsigned int msb = clz(input);
+    unsigned int msb = myclz(input);
     unsigned int mask = (1 << (31 - msb - 1));
-    struct u64 current = {.msl = 0, .lsl = 1}, next = {.msl = 0, .lsl = 1};
+    struct u64 cur = {.msl = 0, .lsl = 1}, next = {.msl = 0, .lsl = 1};
     struct u64 mul = {.msl = 0, .lsl = 2}, zero = {.msl = 0, .lsl = 0};
 
     /* fast doubling formula
@@ -136,54 +137,54 @@ static struct u64 fibonacci(uint32_t input)
     if (input == 0)
         return zero;
     if (input >= 1 && input <= 2)
-        return current;
+        return cur;
 
     while (mask > 0) {
         if (mask & input) {
             // bit = 1: fast doubling then iterate 1
             struct u64 *t0, *t1, *t2, *temp, *temp2;
-            // t0 = current * (2 * next - current);
-            // t1 = next * next + current * current;
+            // t0 = cur * (2 * next - cur);
+            // t1 = next * next + cur * cur;
 
             temp = multiplier(&next, &mul);
-            temp = subtracter(temp, &current);
-            t0 = multiplier(&current, temp);
+            temp = subtracter(temp, &cur);
+            t0 = multiplier(&cur, temp);
 
             t2 = &next;
             temp = multiplier(&next, t2);
-            t2 = &current;
-            temp2 = multiplier(&current, t2);
+            t2 = &cur;
+            temp2 = multiplier(&cur, t2);
             t1 = adder(temp, temp2);
 
-            current = *t0;
+            cur = *t0;
             next = *t1;
 
             // iterate 1
-            temp = adder(&current, &next);
-            current = next;
+            temp = adder(&cur, &next);
+            cur = next;
             next = *temp;
         } else {
             // bit = 0: fast doubling
             struct u64 *t0, *t1, *t2, *temp, *temp2;
-            // t0 = current * (2 * next - current);
-            // t1 = next * next + current * current;
+            // t0 = cur * (2 * next - cur);
+            // t1 = next * next + cur * cur;
 
             temp = multiplier(&next, &mul);
-            temp = subtracter(temp, &current);
-            t0 = multiplier(&current, temp);
+            temp = subtracter(temp, &cur);
+            t0 = multiplier(&cur, temp);
 
             t2 = &next;
             temp = multiplier(&next, t2);
-            t2 = &current;
-            temp2 = multiplier(&current, t2);
+            t2 = &cur;
+            temp2 = multiplier(&cur, t2);
             t1 = adder(temp, temp2);
 
-            current = *t0;
+            cur = *t0;
             next = *t1;
         }
         mask >>= 1;
     }
-    return current;
+    return cur;
 }
 
 static long long fib_sequence(long long k)
@@ -222,7 +223,7 @@ static ssize_t fib_read(struct file *file,
                         size_t size,
                         loff_t *offset)
 {
-	struct u64 result = fibonacci(1);
+    struct u64 result = fibonacci(1);
     return 0;
 }
 

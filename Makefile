@@ -1,17 +1,17 @@
 CONFIG_MODULE_SIG = n
 TARGET_MODULE := fibdrv
 
-CFLAGS := -std=c99 -Wall -Werror
-
 obj-m := $(TARGET_MODULE).o
 ccflags-y := -std=gnu99 -Wno-declaration-after-statement
+
+MYCFLAGS := -std=c99 -Wall -Werror
 
 KDIR := /lib/modules/$(shell uname -r)/build
 PWD := $(shell pwd)
 
 GIT_HOOKS := .git/hooks/applied
 
-all: $(GIT_HOOKS) client transfer
+all: $(GIT_HOOKS)
 	$(MAKE) -C $(KDIR) M=$(PWD) modules
 
 $(GIT_HOOKS):
@@ -30,7 +30,7 @@ client: client.c
 	$(CC) -o $@ $^
 
 transfer: transfer.c
-	$(CC) $(CFLAGS) -o $@ $^
+	$(CC) $(MYCFLAGS) -o $@ $^
 
 plot: time.gp time
 	@gnuplot $<
@@ -41,10 +41,10 @@ fibplot: fibtime.gp result.txt
 	@eog fibtime.png
 
 apa: apa.c apa.h
-	$(CC) $(CFLAGS) -o $@ $^
+	$(CC) $(MYCFLAGS) -o $@ $^
 
 test: apa.h test.c
-	$(CC) $(CFLAGS) -o $@ $^
+	$(CC) $(MYCFLAGS) -o $@ $^
 
 vtest: test.txt verificationTest.py
 	python3 verificationTest.py
@@ -53,11 +53,11 @@ verify: result.txt verification.py
 	python3 verification.py
 
 test.txt: test.c apa.h
-	$(CC) $(CFLAGS) -o test $^
+	$(CC) $(MYCFLAGS) -o test $^
 	./test > /dev/null
 
 result.txt: apa.h apa.c
-	$(CC) $(CFLAGS) -o apa $^
+	$(CC) $(MYCFLAGS) -o apa $^
 	./apa > /dev/null
 
 PRINTF = env printf

@@ -7,6 +7,7 @@
 #include <linux/module.h>
 #include <linux/mutex.h>
 #include <linux/slab.h>
+#include <linux/uaccess.h>
 
 MODULE_LICENSE("Dual MIT/GPL");
 MODULE_AUTHOR("National Cheng Kung University, Taiwan");
@@ -18,7 +19,7 @@ MODULE_VERSION("0.1");
 /* MAX_LENGTH is set to 92 because
  * ssize_t can't fit the number > 92
  */
-#define MAX_LENGTH 92
+#define MAX_LENGTH 150
 
 static dev_t fib_dev = 0;
 static struct cdev *fib_cdev;
@@ -223,7 +224,12 @@ static ssize_t fib_read(struct file *file,
                         size_t size,
                         loff_t *offset)
 {
-    struct u64 result = fibonacci(1);
+    char kbuffer[100] = {0};
+    struct u64 result = fibonacci((int) (*offset));
+
+    sprintf(kbuffer, "%llu*18446744073709551616+%llu\n", result.msl,
+            result.lsl);
+    copy_to_user(buf, kbuffer, 100);
     return 0;
 }
 

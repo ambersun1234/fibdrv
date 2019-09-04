@@ -13,8 +13,11 @@ int main()
 
     char buf[100];
     char write_buf[] = "testing writing";
+    char out[500];
     int offset = 150;  // TODO: test something bigger than the limit
     int i = 0;
+
+    FILE *fp = fopen("kresult.txt", "w");
 
     fd = open(FIB_DEV, O_RDWR);
 
@@ -34,8 +37,10 @@ int main()
         sz = read(fd, buf, i);
         printf("Reading from " FIB_DEV
                " at offset %d, returned the sequence "
-               "%s.\n",
+               "%s.",
                i, buf);
+        sprintf(out, "%d %s", i, buf);
+        fputs(out, fp);
     }
 
     for (int i = offset; i >= 0; i--) {
@@ -43,10 +48,13 @@ int main()
         sz = read(fd, buf, i);
         printf("Reading from " FIB_DEV
                " at offset %d, returned the sequence "
-               "%s.\n",
+               "%s.",
                i, buf);
+        sprintf(out, "%d %s", i, buf);
+        fputs(out, fp);
     }
 
     close(fd);
+    fclose(fp);
     return 0;
 }

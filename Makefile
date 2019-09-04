@@ -49,6 +49,9 @@ test: apa.h test.c
 vtest: test.txt verificationTest.py
 	python3 verificationTest.py
 
+ktest: kresult.txt kernelverification.py
+	python3 kernelverification.py
+
 verify: result.txt verification.py
 	python3 verification.py
 

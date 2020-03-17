@@ -11,6 +11,10 @@ fibonacci number.
 * [cdev interface](https://lwn.net/Articles/195805/)
 * [Character device files](https://sysplay.in/blog/linux-device-drivers/2013/06/character-device-files-creation-operations/)
 
+## Notes
++ [linux2020 fibdrv - ambersun1234](https://hackmd.io/@ambersun1234/linux2020_fibdrv)
++ [linux2019 fibdrv - ambersun1234](https://hackmd.io/@ambersun1234/fibdrv)
+
 ## License
 
 `fibdrv`is released under the MIT license. Use of this source code is governed by

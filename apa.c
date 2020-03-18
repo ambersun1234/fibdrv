@@ -87,9 +87,9 @@ int main()
         result = fibonacci(counter);
         clock_gettime(CLOCK_MONOTONIC, &end);
 
-        printf("%d %llu+%llu*%llu+%llu %ld\n", counter, result.lsl, result.msl,
+        printf("%u %llu+%llu*%llu+%llu %ld\n", counter, result.lsl, result.msl,
                ULLONG_MAX, result.msl, diff_in_ns(start, end));
-        sprintf(buffer, "%d %llu+%llu*%llu+%llu %ld\n", counter, result.lsl,
+        sprintf(buffer, "%u %llu+%llu*%llu+%llu %ld\n", counter, result.lsl,
                 result.msl, ULLONG_MAX, result.msl, diff_in_ns(start, end));
         fputs(buffer, fp);
     }

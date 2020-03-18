@@ -15,11 +15,8 @@ int main()
     char write_buf[] = "testing writing";
     char out[500];
     int offset = 150;  // TODO: test something bigger than the limit
-    int i = 0;
 
     FILE *fp = fopen("kresult.txt", "w");
-
-    fd = open(FIB_DEV, O_RDWR);
 
     int fd = open(FIB_DEV, O_RDWR);
     if (fd < 0) {

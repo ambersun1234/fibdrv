@@ -10,5 +10,5 @@ set output 'time.png'
 set format y
 
 plot[:][:]'time' \
-using 2:xtic(10) with linespoints linewidth 2 title 'User to Kernel', \
-'' using 3:xtic(10) with linespoints linewidth 2 title 'Kernel to User'
+using 1:xtic(10) with linespoints linewidth 2 title 'User to Kernel', \
+'' using 2:xtic(10) with linespoints linewidth 2 title 'Kernel to User'

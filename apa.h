@@ -15,7 +15,7 @@ void displayBit(unsigned long long int input)
 {
     unsigned long long int display = (1ULL << 63);
     for (int i = 1; i <= 64; i++) {
-        putchar(input & display ? '1' : '0');
+        putchar((input & display) ? '1' : '0');
         display >>= 1;
         if (i % 8 == 0)
             putchar(' ');

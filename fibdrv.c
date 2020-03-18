@@ -188,21 +188,6 @@ static struct u64 fibonacci(int input)
     return cur;
 }
 
-static long long fib_sequence(long long k)
-{
-    /* FIXME: use clz/ctz and fast algorithms to speed up */
-    long long f[k + 2];
-
-    f[0] = 0;
-    f[1] = 1;
-
-    for (int i = 2; i <= k; i++) {
-        f[i] = f[i - 1] + f[i - 2];
-    }
-
-    return f[k];
-}
-
 static int fib_open(struct inode *inode, struct file *file)
 {
     if (!mutex_trylock(&fib_mutex)) {
@@ -218,6 +203,8 @@ static int fib_release(struct inode *inode, struct file *file)
     return 0;
 }
 
+static ktime_t curTime;
+
 /* calculate the fibonacci number at given offset */
 static ssize_t fib_read(struct file *file,
                         char *buf,
@@ -225,7 +212,9 @@ static ssize_t fib_read(struct file *file,
                         loff_t *offset)
 {
     char kbuffer[100] = {0};
+    curTime = ktime_get();
     struct u64 result = fibonacci((int) (*offset));
+    curTime = ktime_sub(ktime_get(), curTime);
 
     sprintf(kbuffer, "%llu*18446744073709551616+%llu\n", result.msl,
             result.lsl);
@@ -239,7 +228,7 @@ static ssize_t fib_write(struct file *file,
                          size_t size,
                          loff_t *offset)
 {
-    return 1;
+    return ktime_to_ns(ktime_get());
 }
 
 static loff_t fib_device_lseek(struct file *file, loff_t offset, int orig)

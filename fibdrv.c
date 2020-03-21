@@ -203,8 +203,6 @@ static int fib_release(struct inode *inode, struct file *file)
     return 0;
 }
 
-static ktime_t curTime;
-
 /* calculate the fibonacci number at given offset */
 static ssize_t fib_read(struct file *file,
                         char *buf,
@@ -212,9 +210,7 @@ static ssize_t fib_read(struct file *file,
                         loff_t *offset)
 {
     char kbuffer[100] = {0};
-    curTime = ktime_get();
     struct u64 result = fibonacci((int) (*offset));
-    curTime = ktime_sub(ktime_get(), curTime);
 
     sprintf(kbuffer, "%llu*18446744073709551616+%llu\n", result.msl,
             result.lsl);
@@ -222,13 +218,17 @@ static ssize_t fib_read(struct file *file,
     return 0;
 }
 
+static ktime_t curTime;
 /* write operation is skipped */
 static ssize_t fib_write(struct file *file,
                          const char *buf,
                          size_t size,
                          loff_t *offset)
 {
-    return ktime_to_ns(ktime_get());
+    curTime = ktime_get();
+    fibonacci((int) (*offset));
+    curTime = ktime_sub(ktime_get(), curTime);
+    return ktime_to_ns(curTime);
 }
 
 static loff_t fib_device_lseek(struct file *file, loff_t offset, int orig)

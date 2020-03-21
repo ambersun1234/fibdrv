@@ -11,14 +11,12 @@
 #define FIB_DEV "/dev/fibonacci"
 #define MYMAX 150
 
-#define GETTIME(x) \
-    (long long) ((x).tv_sec * 1e9 + (x).tv_nsec)
+#define GETTIME(x) (long long) ((x).tv_sec * 1e9 + (x).tv_nsec)
 
 int main()
 {
     char buf[MYMAX];
     int offset = MYMAX;  // TODO: test something bigger than the limit
-    int arr[MYMAX + 1] = {0};
     int i = 0;
     struct timespec start, end;
     char out[500];
@@ -37,20 +35,14 @@ int main()
     }
 
     for (i = 0; i <= offset; i++) {
-        int tmp;
-        do {
-            tmp = rand() % (MYMAX + 1);
-        } while (arr[tmp] == 1);
-        arr[tmp] = 1;
-
-        lseek(fd, tmp, SEEK_SET);
+        lseek(fd, i, SEEK_SET);
         clock_gettime(CLOCK_MONOTONIC, &start);
-        ssize_t t = write(fd, &buf, sizeof(ssize_t));
+        ssize_t t = write(fd, &buf, i);
         clock_gettime(CLOCK_MONOTONIC, &end);
 
-        printf("%lld %ld %lld\n", GETTIME(start), t, GETTIME(end));
+        printf("%d %lld %ld %lld\n", i, GETTIME(start), t, GETTIME(end));
 
-        sprintf(out, "%lld %lld\n",(long long)t - GETTIME(start) , GETTIME(end) - (long long)t);
+        sprintf(out, "%d %ld\n", i, t);
         fputs(out, fp);
     }
 
